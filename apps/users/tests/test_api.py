@@ -61,7 +61,7 @@ class UserTest(TestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_invalid_retrieve_user(self):
-        user_not_exists_pk = self.numbers_of_users + 10
+        user_not_exists_pk = User.objects.last().pk + 10
         response = self.client.get(reverse('user-detail', kwargs={'pk': user_not_exists_pk}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -141,6 +141,6 @@ class UserTest(TestCase):
         self.assertFalse(user_exists)
 
     def test_invalid_delete_user(self):
-        user_not_exists_pk = self.numbers_of_users + 10
+        user_not_exists_pk = User.objects.last().pk + 10
         response = self.client.delete(reverse('user-detail', kwargs={'pk': user_not_exists_pk}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
