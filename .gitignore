@@ -1,0 +1,25 @@
+### Project ###
+.idea/
+venv
+.vscode/
+media
+*.sqlite3
+.env
+
+
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Translations
+*.mo
+*.pot
+
+### Django ###
+*.log
+*.pyc
