@@ -39,7 +39,7 @@ class UserTest(TestCase):
             )
             user.set_password(f'passuser{i}')
             user.save()
-            self.user_list.append(user.pk)
+            self.user_list.append(user.username)
 
     def test_list_users(self):
         response = self.client.get(reverse('user-list'))
@@ -52,17 +52,17 @@ class UserTest(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_retrieve_user(self):
-        for user_pk in self.user_list:
-            response = self.client.get(reverse('user-detail', kwargs={'pk': user_pk}))
+        for username in self.user_list:
+            response = self.client.get(reverse('user-detail', kwargs={'username': username}))
 
-            user = User.objects.get(pk=user_pk)
+            user = User.objects.get(username=username)
             serializer = UserSerializer(user)
             self.assertEqual(response.data, serializer.data)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_invalid_retrieve_user(self):
-        user_not_exists_pk = User.objects.last().pk + 10
-        response = self.client.get(reverse('user-detail', kwargs={'pk': user_not_exists_pk}))
+        user_not_exists = 'username_not_exists_on_db'
+        response = self.client.get(reverse('user-detail', kwargs={'username': user_not_exists}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_and_authenticate_user(self):
@@ -88,7 +88,8 @@ class UserTest(TestCase):
         valid_user_data['username'] = updated_username
         valid_user_data['password'] = updated_password
 
-        response = self.client.put(reverse('user-detail', kwargs={'pk': self.user_list[0]}),
+        to_update = self.user_list[0]
+        response = self.client.put(reverse('user-detail', kwargs={'username': to_update}),
                                    data=json.dumps(valid_user_data),
                                    content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -97,7 +98,8 @@ class UserTest(TestCase):
                                           password=updated_password))
 
     def test_invalid_update_user(self):
-        response = self.client.put(reverse('user-detail', kwargs={'pk': self.user_list[0]}),
+        to_update = self.user_list[0]
+        response = self.client.put(reverse('user-detail', kwargs={'username': to_update}),
                                    data=json.dumps(self.invalid_user_data),
                                    content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -112,7 +114,8 @@ class UserTest(TestCase):
         valid_user_data['username'] = partial_updated_username
         valid_user_data['password'] = partial_updated_password
 
-        response = self.client.patch(reverse('user-detail', kwargs={'pk': self.user_list[0]}),
+        to_update = self.user_list[0]
+        response = self.client.patch(reverse('user-detail', kwargs={'username': to_update}),
                                      data=json.dumps(valid_user_data),
                                      content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -125,7 +128,8 @@ class UserTest(TestCase):
             'username': '',
             'password': '',
         }
-        response = self.client.patch(reverse('user-detail', kwargs={'pk': self.user_list[0]}),
+        to_update = self.user_list[0]
+        response = self.client.patch(reverse('user-detail', kwargs={'username': to_update}),
                                      data=json.dumps(partial_invalid_user_data),
                                      content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -133,14 +137,14 @@ class UserTest(TestCase):
         self.assertIn('This field may not be blank.', response.json().get('password'))
 
     def test_delete_user(self):
-        user_pk = self.user_list[0]
-        response = self.client.delete(reverse('user-detail', kwargs={'pk': user_pk}))
+        to_delete = self.user_list[0]
+        response = self.client.delete(reverse('user-detail', kwargs={'username': to_delete}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        user_exists = User.objects.filter(pk=user_pk).exists()
+        user_exists = User.objects.filter(username=to_delete).exists()
         self.assertFalse(user_exists)
 
     def test_invalid_delete_user(self):
-        user_not_exists_pk = User.objects.last().pk + 10
-        response = self.client.delete(reverse('user-detail', kwargs={'pk': user_not_exists_pk}))
+        user_not_exists = 'username_not_exists_on_db'
+        response = self.client.delete(reverse('user-detail', kwargs={'username': user_not_exists}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
