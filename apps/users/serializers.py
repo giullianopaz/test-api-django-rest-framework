@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.companies.models import Company
 from apps.users.models import User
 
 
@@ -8,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('pk', 'password', 'username', 'email', 'first_name', 'last_name', 'companies')
         extra_kwargs = {'password': {'write_only': True}, 'pk': {'read_only': True}, 'companies': {'required': False}}
+        depth = None
 
     def create(self, validated_data):
         password = validated_data.pop('password') if validated_data.get('password') else None

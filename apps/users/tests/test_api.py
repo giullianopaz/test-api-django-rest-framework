@@ -135,6 +135,27 @@ class UserTest(TestCase):
         self.assertIn('This field may not be blank.', response.json().get('username'))
         self.assertIn('This field may not be blank.', response.json().get('password'))
 
+    def test_add_companies_to_user(self):
+        numbers_of_companies = 3
+        company_list = [
+            Company.objects.create(
+                name=f'Company {i} LTDA',
+                trading_name=f'Company {i}',
+                registered_number=f'2024027200017{i}',
+                email=f'contato@company{i}.com',
+                phone=f'999999999{i}',
+            ).pk for i in range(1, numbers_of_companies + 1)
+        ]
+
+        username = self.user_list[0]
+        response = self.client.post(reverse('user-add-companies', kwargs={'username': username}),
+                                     data=json.dumps({
+                                         'companies': company_list
+                                     }),
+                                     content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(User.objects.get(username=username).companies.count(), numbers_of_companies)
+
     def test_update_companies_to_user(self):
         numbers_of_companies = 3
         company_list = [
@@ -147,42 +168,56 @@ class UserTest(TestCase):
             ).pk for i in range(1, numbers_of_companies + 1)
         ]
 
-        to_add_company = self.user_list[0]
-        response = self.client.patch(reverse('user-detail', kwargs={'username': to_add_company}),
+        username = self.user_list[0]
+        response = self.client.put(reverse('user-update-companies', kwargs={'username': username}),
                                      data=json.dumps({
                                          'companies': company_list
                                      }),
                                      content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.get(username=to_add_company).companies.count(), numbers_of_companies)
+        self.assertEqual(User.objects.get(username=username).companies.count(), numbers_of_companies)
 
-        response = self.client.patch(reverse('user-detail', kwargs={'username': to_add_company}),
+    def test_delete_companies_from_user(self):
+        numbers_of_companies = 3
+        company_list = [
+            Company.objects.create(
+                name=f'Company {i} LTDA',
+                trading_name=f'Company {i}',
+                registered_number=f'2024027200017{i}',
+                email=f'contato@company{i}.com',
+                phone=f'999999999{i}',
+            ).pk for i in range(1, numbers_of_companies + 1)
+        ]
+
+        user = User.objects.get(username=self.user_list[0])
+        user.add_companies(Company.get_existing_by_pk(company_list))
+
+        response = self.client.delete(reverse('user-delete-companies', kwargs={'username': user.username}),
                                      data=json.dumps({
-                                         'companies': []
+                                         'companies': company_list[:-1]
                                      }),
                                      content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.get(username=to_add_company).companies.count(), 0)
+        self.assertEqual(user.get_companies().count(), 1)
 
-    def test_invalid_update_companies_to_user(self):
+    def test_clean_companies_from_user(self):
         numbers_of_companies = 3
-        last_company_pk = Company.objects.create(
-            name=f'Company LTDA',
-            trading_name=f'Company',
-            registered_number=f'20240272000178',
-            email=f'contato@company.com',
-            phone=f'9999999999',
-            ).pk
-        company_not_exists_list = [i for i in range(last_company_pk, last_company_pk + numbers_of_companies)]
+        company_list = [
+            Company.objects.create(
+                name=f'Company {i} LTDA',
+                trading_name=f'Company {i}',
+                registered_number=f'2024027200017{i}',
+                email=f'contato@company{i}.com',
+                phone=f'999999999{i}',
+            ).pk for i in range(1, numbers_of_companies + 1)
+        ]
 
-        to_add_company = self.user_list[0]
-        response = self.client.patch(reverse('user-detail', kwargs={'username': to_add_company}),
-                                     data=json.dumps({
-                                         'companies': company_not_exists_list
-                                     }),
-                                     content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.get(username=to_add_company).companies.count(), 0)
+        user = User.objects.get(username=self.user_list[0])
+        user.add_companies(Company.get_existing_by_pk(company_list))
+
+        response = self.client.delete(reverse('user-clean-companies', kwargs={'username': user.username}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(user.get_companies().count(), 0)
 
     def test_delete_user(self):
         to_delete = self.user_list[0]
