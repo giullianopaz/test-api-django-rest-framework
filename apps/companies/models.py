@@ -8,10 +8,19 @@ class Company(models.Model):
     email = models.EmailField(verbose_name='Email', max_length=100, unique=True)
     phone = models.CharField(verbose_name='Telefone', max_length=20, blank=True, null=True)
 
-    employees = models.ManyToManyField('users.User', related_name='companies', verbose_name='Funcionários')
+    employees = models.ManyToManyField('users.User', related_name='companies', verbose_name='Funcionários',
+                                       through='Membership')
 
     class Meta:
         ordering = ['name', 'trading_name']
 
     def __str__(self):
         return self.name
+
+
+class Membership(models.Model):
+    company = models.ForeignKey('companies.Company', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} | {self.company}"
