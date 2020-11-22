@@ -109,10 +109,8 @@ class UserTest(TestCase):
 
     def test_partial_update_user(self):
         partial_updated_username = 'partial_updated_usertest'
-        partial_updated_password = 'partial_updated_passuser'
         valid_user_data = self.valid_user_data.copy()
         valid_user_data['username'] = partial_updated_username
-        valid_user_data['password'] = partial_updated_password
 
         to_update = self.user_list[0]
         response = self.client.patch(reverse('user-detail', kwargs={'username': to_update}),
@@ -121,7 +119,7 @@ class UserTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json().get('username'), partial_updated_username)
         self.assertIsNotNone(authenticate(username=partial_updated_username,
-                                          password=partial_updated_password))
+                                          password=self.valid_user_data.get('password')))
 
     def test_invalid_partial_update_user(self):
         partial_invalid_user_data = {
