@@ -1,7 +1,7 @@
 import os
+import dj_database_url
 
 from decouple import config
-from dj_database_url import parse as db_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +25,6 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'apps.core',
     'apps.users',
     'apps.companies',
 ]
@@ -64,9 +63,11 @@ DATABASES = {
     'default': config(
         'DATABASE_URL',
         default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
-        cast=db_url
+        cast=dj_database_url.parse
     )
 }
+db_from_env = dj_database_url.config()
+DATABASES['default'].update(db_from_env)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
