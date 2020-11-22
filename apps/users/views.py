@@ -1,12 +1,10 @@
-from django.shortcuts import render
-
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.companies.models import Company
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
-from apps.companies.serializers import CompanySerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -18,7 +16,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def add_companies(self, request, *args, **kwargs):
         user = self.get_object()
         if 'companies' in request.data:
-            user.add_companies(request.data.get('companies'))
+            existing_companies = Company.get_existing_by_pk(request.data.get('companies'))
+            user.add_companies(existing_companies)
         serializer = self.get_serializer(user)
         return Response(serializer.data)
 
@@ -26,7 +25,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def update_companies(self, request, *args, **kwargs):
         user = self.get_object()
         if 'companies' in request.data:
-            user.update_companies(request.data.get('companies'))
+            existing_companies = Company.get_existing_by_pk(request.data.get('companies'))
+            user.update_companies(existing_companies)
         serializer = self.get_serializer(user)
         return Response(serializer.data)
 
@@ -34,7 +34,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def delete_companies(self, request, *args, **kwargs):
         user = self.get_object()
         if 'companies' in request.data:
-            user.delete_companies(request.data.get('companies'))
+            existing_companies = Company.get_existing_by_pk(request.data.get('companies'))
+            user.delete_companies(existing_companies)
         serializer = self.get_serializer(user)
         return Response(serializer.data)
 

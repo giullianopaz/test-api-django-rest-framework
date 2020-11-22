@@ -190,7 +190,7 @@ class UserTest(TestCase):
         ]
 
         user = User.objects.get(username=self.user_list[0])
-        user.add_companies(company_list)
+        user.add_companies(Company.get_existing_by_pk(company_list))
 
         response = self.client.delete(reverse('user-delete-companies', kwargs={'username': user.username}),
                                      data=json.dumps({
@@ -213,7 +213,7 @@ class UserTest(TestCase):
         ]
 
         user = User.objects.get(username=self.user_list[0])
-        user.add_companies(company_list)
+        user.add_companies(Company.get_existing_by_pk(company_list))
 
         response = self.client.delete(reverse('user-clean-companies', kwargs={'username': user.username}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
