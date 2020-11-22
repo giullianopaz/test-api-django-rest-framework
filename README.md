@@ -13,7 +13,7 @@
 
 Aplicação foi hospedada no Heroku para testes.
 
-URL: [https://test-api-django-rest-framework.herokuapp.com/](https://test-api-django-rest-framework.herokuapp.com/users/)
+URL: [https://test-api-django-rest-framework.herokuapp.com/](https://test-api-django-rest-framework.herokuapp.com/)
 
 ## Explicação sobre abordagem e tomadas de decisões
 
