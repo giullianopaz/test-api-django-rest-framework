@@ -474,20 +474,20 @@ Response:
 ```json
 [
     {
-				"pk": 1,
-				"username": "giullianopaz",
-				"email": "giulliano@email.com",
-				"first_name": "Giulliano",
-				"last_name": "Paz",
-				"companies": []
+	"pk": 1,
+	"username": "giullianopaz",
+	"email": "giulliano@email.com",
+	"first_name": "Giulliano",
+	"last_name": "Paz",
+	"companies": []
     },
     {
-				"pk": 2,
-				"username": "fulano",
-				"email": "fulano@email.com",
-				"first_name": "Fulano",
-				"last_name": "de Tal",
-				"companies": [
+	"pk": 2,
+	"username": "fulano",
+	"email": "fulano@email.com",
+	"first_name": "Fulano",
+	"last_name": "de Tal",
+	"companies": [
             1,
             2
         ]
@@ -509,14 +509,14 @@ Response:
 
 ```json
 {
-		"pk": 2,
-		"username": "fulano",
-		"email": "fulano@email.com",
-		"first_name": "Fulano",
-		"last_name": "de Tal",
-		"companies": [
-        1,
-        2
+	"pk": 2,
+	"username": "fulano",
+	"email": "fulano@email.com",
+	"first_name": "Fulano",
+	"last_name": "de Tal",
+	"companies": [
+		1,
+		2
     ]
 }
 ```
@@ -654,7 +654,7 @@ Response:
 }
 ```
 
-**Deletar empresas do empresa**
+**Deletar empresas do usuário**
 
 É possível deletar uma ou mais empresas ao mesmo tempo. 
 
