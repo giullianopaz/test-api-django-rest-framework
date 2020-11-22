@@ -8,7 +8,7 @@ class Company(models.Model):
     email = models.EmailField(verbose_name='Email', max_length=100, unique=True)
     phone = models.CharField(verbose_name='Telefone', max_length=20, blank=True, null=True)
 
-    employees = models.ManyToManyField('users.User', verbose_name='Funcionários')
+    employees = models.ManyToManyField('users.User', related_name='companies', verbose_name='Funcionários')
 
     class Meta:
         ordering = ['name', 'trading_name']
