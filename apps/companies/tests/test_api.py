@@ -6,6 +6,7 @@ from rest_framework import status
 
 from apps.companies.models import Company
 from apps.companies.serializers import CompanySerializer
+from apps.users.models import User
 
 
 class CompanyTest(TestCase):
@@ -126,6 +127,90 @@ class CompanyTest(TestCase):
         self.assertIn('This field may not be blank.', response.json().get('name'))
         self.assertIn('This field may not be blank.', response.json().get('registered_number'))
         self.assertIn('Enter a valid email address.', response.json().get('email'))
+
+    def test_add_employees_to_company(self):
+        numbers_of_employees = 3
+        employee_list = []
+        for i in range(1, numbers_of_employees + 1):
+            user = User.objects.create_user(
+                username=f'usertest{i}',
+                first_name='User',
+                last_name=f'Test {i}',
+                email=f'test{i}@test.com',
+            )
+            employee_list.append(user.pk)
+
+        test_company_pk = self.company_list[0]
+        response = self.client.post(reverse('company-add-employees', kwargs={'pk': test_company_pk}),
+                                     data=json.dumps({
+                                         'employees': employee_list
+                                     }),
+                                     content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Company.objects.get(pk=test_company_pk).employees.count(), numbers_of_employees)
+
+    def test_update_employees_to_company(self):
+        numbers_of_employees = 3
+        employee_list = []
+        for i in range(1, numbers_of_employees + 1):
+            user = User.objects.create_user(
+                username=f'usertest{i}',
+                first_name='User',
+                last_name=f'Test {i}',
+                email=f'test{i}@test.com',
+            )
+            employee_list.append(user.pk)
+
+        test_company_pk = self.company_list[0]
+        response = self.client.put(reverse('company-update-employees', kwargs={'pk': test_company_pk}),
+                                     data=json.dumps({
+                                         'employees': employee_list
+                                     }),
+                                     content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Company.objects.get(pk=test_company_pk).employees.count(), numbers_of_employees)
+
+    def test_delete_employees_to_company(self):
+        numbers_of_employees = 3
+        employee_list = []
+        for i in range(1, numbers_of_employees + 1):
+            user = User.objects.create_user(
+                username=f'usertest{i}',
+                first_name='User',
+                last_name=f'Test {i}',
+                email=f'test{i}@test.com',
+            )
+            employee_list.append(user.pk)
+
+        test_company = Company.objects.get(pk=self.company_list[0])
+        test_company.add_employees(User.get_existing_by_pk(employee_list))
+
+        response = self.client.delete(reverse('company-delete-employees', kwargs={'pk': test_company.pk}),
+                                     data=json.dumps({
+                                         'employees': employee_list[:-1]
+                                     }),
+                                     content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(test_company.get_employees().count(), 1)
+
+    def test_clean_employees_to_company(self):
+        numbers_of_employees = 3
+        employee_list = []
+        for i in range(1, numbers_of_employees + 1):
+            user = User.objects.create_user(
+                username=f'usertest{i}',
+                first_name='User',
+                last_name=f'Test {i}',
+                email=f'test{i}@test.com',
+            )
+            employee_list.append(user.pk)
+
+        test_company = Company.objects.get(pk=self.company_list[0])
+        test_company.add_employees(User.get_existing_by_pk(employee_list))
+
+        response = self.client.delete(reverse('company-clean-employees', kwargs={'pk': test_company.pk}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(test_company.get_employees().count(), 0)
 
     def test_delete_company(self):
         company_pk = self.company_list[0]
