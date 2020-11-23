@@ -99,7 +99,7 @@ SECRET_KEY='sua_chave_secreta'
 DATABASE_URL=postgres://{user}:{senha}@localhost:15432/{nome_database}
 ```
 
-De `DEBUG` não for informado, o default dele é `False`. Se `DATABASE_URL` não for informado, o projeto rodará utilizando o SQLite. A única configuração realmente necessária é a `SECRET_KEY`. Sem ela, o projeto não rodará.
+Se `DEBUG` não for informado, o default dele é `False`. Se `DATABASE_URL` não for informado, o projeto rodará utilizando o SQLite. A única configuração realmente necessária é a `SECRET_KEY`. Sem ela, o projeto não rodará.
 
 Após essas configurações, basta seguir o fluxo normal dos projetos Django:
 
