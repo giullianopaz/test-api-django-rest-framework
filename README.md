@@ -15,6 +15,102 @@ Aplicação foi hospedada no Heroku para testes.
 
 URL: [https://test-api-django-rest-framework.herokuapp.com/](https://test-api-django-rest-framework.herokuapp.com/)
 
+## Execução do projeto
+
+### **Passos para executar o projeto localmente**
+
+**Criar um ambiente virtual Python (venv, virtualenv, etc.):**
+
+> $ virtualenv -p python3 venv
+
+**Ativar a venv:**
+
+> $ source venv/bin/activate
+
+**Instalar pacotes necessários:**
+
+> $ pip install -r requirements.txt
+
+**Utilização do Postgres como banco de dados**
+
+Você pode rodar o projeto usando o banco de dados SQLite, mas, se quiser rodar usando o Postgres, será necessário instalá-lo.
+
+Para o desenvolvimento, foi utilizado o Postgres via Docker:
+
+```yaml
+version: '3'
+
+networks: 
+  postgres-network:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:12.2-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+    ports:
+      - "15432:5432"
+    restart: always
+    volumes:
+      - $PWD/database/data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASS}
+    ports:
+      - "16543:80"
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - postgres-network
+```
+
+Após subir o container, basta acessar o PGAdmin e criar um server e um database com o nome que for do seu interesse.
+
+**Obs**: Mesmo utilizando o Postgres via Docker, talvez seja necessário instalar dependências:
+
+> sudo apt install libpq-dev python3-dev
+
+Se não for o suficiente:
+
+> sudo apt install build-essential
+
+ou
+
+> sudo apt install postgresql-server-dev-all
+
+**Configuração do arquivo .env**
+
+Por questões de segurança, variáveis, chaves e configurações sensíveis ficam em um arquivo .env na raiz do projeto Django. Para isso, basta criar um arquivo de texto normal com o nome .env no mesmo nível que `manage.py`.
+
+No arquivo você pode informar:
+
+```
+DEBUG=True
+
+SECRET_KEY='sua_chave_secreta'
+
+DATABASE_URL=postgres://{user}:{senha}@localhost:15432/{nome_database}
+```
+
+De `DEBUG` não for informado, o default dele é `False`. Se `DATABASE_URL` não for informado, o projeto rodará utilizando o SQLite. A única configuração realmente necessária é a `SECRET_KEY`. Sem ela, o projeto não rodará.
+
+Após essas configurações, basta seguir o fluxo normal dos projetos Django:
+
+> $ python [manage.py](http://manage.py) makemigrations
+
+> $ python [manage.py](http://manage.py/) migrate
+
+> $ python [manage.py](http://manage.py/) test
+
+> $ python [manage.py](http://manage.py/) runserver
+
 ## Explicação sobre abordagem e tomadas de decisões
 
 ### Enunciado do teste
@@ -290,7 +386,7 @@ Response:
                 1
             ]
         },
-				{
+	{
             "pk": 2,
             "username": "employee2",
             "email": "employee2@email.com",
@@ -300,7 +396,7 @@ Response:
                 1
             ]
         },
-				{
+	{
             "pk": 3,
             "username": "employee3",
             "email": "employee3@email.com",
@@ -392,7 +488,7 @@ Response:
     "email": "contato@companyhero.com",
     "phone": "9999999999",
     "employees": [
-				{
+	{
             "pk": 2,
             "username": "employee2",
             "email": "employee2@email.com",
